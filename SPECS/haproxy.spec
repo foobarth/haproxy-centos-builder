@@ -6,23 +6,24 @@
 
 %global _hardened_build 1
 
+%define devtag dev22
+
 Name:           haproxy
-Version:        1.4.24
-Release:        1%{?dist}
+Version:        1.5
+Release:        0.3.%{devtag}%{?dist}
 Summary:        HA-Proxy is a TCP/HTTP reverse proxy for high availability environments
 
 Group:          System Environment/Daemons
 License:        GPLv2+
 
 URL:            http://haproxy.1wt.eu/
-Source0:        http://haproxy.1wt.eu/download/1.4/src/haproxy-%{version}.tar.gz
+Source0:        http://haproxy.1wt.eu/download/1.4/src/haproxy-%{version}-%{devtag}.tar.gz
 Source1:        %{name}.service
 Source2:        %{name}.cfg
 Source3:        %{name}.logrotate
 
 BuildRequires:  pcre-devel
 BuildRequires:  systemd-units
-
 
 Requires(pre):      shadow-utils
 Requires(post):     systemd
@@ -43,7 +44,7 @@ availability environments. Indeed, it can:
 
 
 %prep
-%setup -q
+%setup -q -n haproxy-%{version}-%{devtag}
 
 
 %build
@@ -91,15 +92,17 @@ done
 
 
 %pre
-getent group %{haproxy_group} >/dev/null || groupadd -r %{haproxy_group}
-getent passwd %{haproxy_user} >/dev/null || \
-    useradd -r -g %{haproxy_user} -d %{haproxy_home} -s /sbin/nologin \
-    -c "HAProxy user" %{haproxy_user}
+getent group %{haproxy_group} >/dev/null || groupadd \
+    -g 188 -r %{haproxy_group}
+getent passwd %{haproxy_user} >/dev/null || useradd \
+    -u 188 -r -g %{haproxy_group} -d %{haproxy_home} \
+    -s /sbin/nologin -c "haproxy" %{haproxy_user}
 exit 0
 
 
 %post
 %systemd_post %{name}.service
+
 
 %preun
 %systemd_preun %{name}.service
@@ -125,12 +128,28 @@ exit 0
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %{_unitdir}/%{name}.service
 %{_sbindir}/%{name}
+%{_sbindir}/%{name}-systemd-wrapper
 %{_bindir}/halog
 %{_mandir}/man1/%{name}.1.gz
 %attr(-,%{haproxy_user},%{haproxy_group}) %dir %{haproxy_home}
 
 
 %changelog
+* Fri Feb 28 2014 Ryan O'Hara <rohara@redhat.com> - 1.5-0.3.dev22
+- Use haproxy-systemd-wrapper in service file (#1067060)
+
+* Wed Feb 12 2014 Ryan O'Hara <rohara@redhat.com> - 1.5-0.2.dev22
+- Specify assigned UID in useradd
+
+* Mon Feb 10 2014 Ryan O'Hara <rohara@redhat.com> - 1.5-0.1.dev22
+- Update to development release 1.5-dev22 (#1043658)
+
+* Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 1.4.24-3
+- Mass rebuild 2014-01-24
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 1.4.24-2
+- Mass rebuild 2013-12-27
+
 * Mon Jun 17 2013 Ryan O'Hara <rohara@redhat.com> - 1.4.24-1
 - Update to 1.4.24 (CVE-2013-2174, #975160)
 
