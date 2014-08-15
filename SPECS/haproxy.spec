@@ -6,23 +6,25 @@
 
 %global _hardened_build 1
 
-%define devtag dev22
-
 Name:           haproxy
-Version:        1.5
-Release:        0.3.%{devtag}%{?dist}
+Version:        1.5.2
+Release:        2%{?dist}
 Summary:        HA-Proxy is a TCP/HTTP reverse proxy for high availability environments
 
 Group:          System Environment/Daemons
 License:        GPLv2+
 
 URL:            http://haproxy.1wt.eu/
-Source0:        http://haproxy.1wt.eu/download/1.4/src/haproxy-%{version}-%{devtag}.tar.gz
+Source0:        http://haproxy.1wt.eu/download/1.5/src/haproxy-%{version}.tar.gz
 Source1:        %{name}.service
 Source2:        %{name}.cfg
 Source3:        %{name}.logrotate
 
+Patch0:         halog-unused-variables.patch
+
 BuildRequires:  pcre-devel
+BuildRequires:  zlib-devel
+BuildRequires:  openssl-devel
 BuildRequires:  systemd-units
 
 Requires(pre):      shadow-utils
@@ -44,8 +46,8 @@ availability environments. Indeed, it can:
 
 
 %prep
-%setup -q -n haproxy-%{version}-%{devtag}
-
+%setup -q
+%patch0 -p0
 
 %build
 # No configure script is present, it is all done via make flags
@@ -58,7 +60,7 @@ regparm_opts=
 regparm_opts="USE_REGPARM=1"
 %endif
 
-make %{?_smp_mflags} CPU="generic" TARGET="linux2628" USE_PCRE=1 ${regparm_opts} ADDINC="%{optflags}" USE_LINUX_TPROXY=1 ADDLIB="%{__global_ldflags}"
+make %{?_smp_mflags} CPU="generic" TARGET="linux2628" USE_OPENSSL=1 USE_PCRE=1 USE_ZLIB=1 ${regparm_opts} ADDINC="%{optflags}" USE_LINUX_TPROXY=1 ADDLIB="%{__global_ldflags}"
 
 # build the halog contrib program.
 pushd contrib/halog
@@ -133,8 +135,19 @@ exit 0
 %{_mandir}/man1/%{name}.1.gz
 %attr(-,%{haproxy_user},%{haproxy_group}) %dir %{haproxy_home}
 
-
 %changelog
+* Thu Jul 31 2014 Ryan O'Hara <rohara@redhat.com> - 1.5.2-2
+- Bump release number (#1120228)
+
+* Thu Jul 17 2014 Ryan O'Hara <rohara@redhat.com> - 1.5.2-1
+- Update to stable release 1.5.2 (#1120228)
+
+* Tue Jul 17 2014 Ryan O'Hara <rohara@redhat.com> - 1.5.1-2
+- Build with openssl and zlib (#1120673)
+
+* Thu Jul 17 2014 Ryan O'Hara <rohara@redhat.com> - 1.5.1-1
+- Update to stable release 1.5.1 (#1120228)
+
 * Fri Feb 28 2014 Ryan O'Hara <rohara@redhat.com> - 1.5-0.3.dev22
 - Use haproxy-systemd-wrapper in service file (#1067060)
 
