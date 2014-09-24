@@ -8,7 +8,7 @@
 
 Name:           haproxy
 Version:        1.5.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        HA-Proxy is a TCP/HTTP reverse proxy for high availability environments
 
 Group:          System Environment/Daemons
@@ -21,6 +21,7 @@ Source2:        %{name}.cfg
 Source3:        %{name}.logrotate
 
 Patch0:         halog-unused-variables.patch
+Patch1:         haproxy-dont-update-msg-sov.patch
 
 BuildRequires:  pcre-devel
 BuildRequires:  zlib-devel
@@ -48,6 +49,7 @@ availability environments. Indeed, it can:
 %prep
 %setup -q
 %patch0 -p0
+%patch1 -p1
 
 %build
 # No configure script is present, it is all done via make flags
@@ -136,6 +138,9 @@ exit 0
 %attr(-,%{haproxy_user},%{haproxy_group}) %dir %{haproxy_home}
 
 %changelog
+* Thu Sep 04 2014 Ryan O'Hara <rohara@redhat.com> - 1.5.2-3
+- Fix remote client denial of service vulnerability (#1138191)
+
 * Thu Jul 31 2014 Ryan O'Hara <rohara@redhat.com> - 1.5.2-2
 - Bump release number (#1120228)
 
