@@ -1,5 +1,5 @@
---- contrib/halog/halog.c.orig	2014-06-27 14:22:26.464296394 -0500
-+++ contrib/halog/halog.c	2014-06-27 14:23:07.915599498 -0500
+--- contrib/halog/halog.c.orig	2014-07-25 01:56:07.000000000 -0500
++++ contrib/halog/halog.c	2014-07-25 15:24:56.996876765 -0500
 @@ -462,7 +462,7 @@ int convert_date(const char *field)
  {
  	unsigned int h, m, s, ms;
