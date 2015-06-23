@@ -8,7 +8,7 @@
 
 Name:           haproxy
 Version:        1.5.4
-Release:        2%{?dist}
+Release:        4%{?dist}
 Summary:        TCP/HTTP proxy and load balancer for high availability environments
 
 Group:          System Environment/Daemons
@@ -23,6 +23,7 @@ Source4:        halog.1
 
 Patch0:         halog-unused-variables.patch
 Patch1:         iprange-return-type.patch
+Patch2:         haproxy-tcp-user-timeout.patch
 
 BuildRequires:  pcre-devel
 BuildRequires:  zlib-devel
@@ -52,6 +53,7 @@ availability environments. Indeed, it can:
 %setup -q
 %patch0 -p0
 %patch1 -p0
+%patch2 -p1
 
 %build
 regparm_opts=
@@ -59,7 +61,7 @@ regparm_opts=
 regparm_opts="USE_REGPARM=1"
 %endif
 
-%{__make} %{?_smp_mflags} CPU="generic" TARGET="linux2628" USE_OPENSSL=1 USE_PCRE=1 USE_ZLIB=1 ${regparm_opts} ADDINC="%{optflags}" USE_LINUX_TPROXY=1 ADDLIB="%{__global_ldflags}"
+%{__make} %{?_smp_mflags} CPU="generic" TARGET="linux2628" USE_OPENSSL=1 USE_PCRE=1 USE_ZLIB=1 ${regparm_opts} ADDINC="%{optflags}" USE_LINUX_TPROXY=1 ADDLIB="%{__global_ldflags}" DEFINE=-DTCP_USER_TIMEOUT=18
 
 pushd contrib/halog
 %{__make} halog OPTIMIZE="%{optflags}"
@@ -135,6 +137,12 @@ exit 0
 %attr(-,%{haproxy_user},%{haproxy_group}) %dir %{haproxy_home}
 
 %changelog
+* Thu May 21 2015 Ryan O'Hara <rohara@redhat.com> - 1.5.4-4
+- Define TCP_USER_TIMEOUT at build time (#1198791)
+
+* Tue May 05 2015 Ryan O'Hara <rohara@redhat.com> - 1.5.4-3
+- Add tcp-ut bind option to set TCP_USER_TIMEOUT (#1198791)
+
 * Tue Nov 18 2014 Ryan O'Hara <rohara@redhat.com> - 1.5.4-2
 - Fix date in changelog
 
