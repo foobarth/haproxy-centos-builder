@@ -8,7 +8,7 @@
 
 Name:           haproxy
 Version:        1.5.4
-Release:        4%{?dist}
+Release:        4%{?dist}.1
 Summary:        TCP/HTTP proxy and load balancer for high availability environments
 
 Group:          System Environment/Daemons
@@ -24,6 +24,7 @@ Source4:        halog.1
 Patch0:         halog-unused-variables.patch
 Patch1:         iprange-return-type.patch
 Patch2:         haproxy-tcp-user-timeout.patch
+Patch3:         haproxy-buffer-slow-realign.patch
 
 BuildRequires:  pcre-devel
 BuildRequires:  zlib-devel
@@ -54,6 +55,7 @@ availability environments. Indeed, it can:
 %patch0 -p0
 %patch1 -p0
 %patch2 -p1
+%patch3 -p1
 
 %build
 regparm_opts=
@@ -137,6 +139,9 @@ exit 0
 %attr(-,%{haproxy_user},%{haproxy_group}) %dir %{haproxy_home}
 
 %changelog
+* Thu Jul 16 2015 Ryan O'Hara <rohara@redhat.com> - 1.5.4-4.1
+- Fix buffer_slow_realign() function to respect output data (CVE-2015-3281, #1241537)
+
 * Thu May 21 2015 Ryan O'Hara <rohara@redhat.com> - 1.5.4-4
 - Define TCP_USER_TIMEOUT at build time (#1198791)
 
