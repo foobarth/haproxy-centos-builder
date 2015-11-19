@@ -7,8 +7,8 @@
 %global _hardened_build 1
 
 Name:           haproxy
-Version:        1.5.4
-Release:        4%{?dist}.1
+Version:        1.5.14
+Release:        3%{?dist}
 Summary:        TCP/HTTP proxy and load balancer for high availability environments
 
 Group:          System Environment/Daemons
@@ -19,12 +19,12 @@ Source0:        http://www.haproxy.org/download/1.5/src/haproxy-%{version}.tar.g
 Source1:        %{name}.service
 Source2:        %{name}.cfg
 Source3:        %{name}.logrotate
-Source4:        halog.1
+Source4:        %{name}.sysconfig
+Source5:        halog.1
 
 Patch0:         halog-unused-variables.patch
 Patch1:         iprange-return-type.patch
 Patch2:         haproxy-tcp-user-timeout.patch
-Patch3:         haproxy-buffer-slow-realign.patch
 
 BuildRequires:  pcre-devel
 BuildRequires:  zlib-devel
@@ -55,7 +55,6 @@ availability environments. Indeed, it can:
 %patch0 -p0
 %patch1 -p0
 %patch2 -p1
-%patch3 -p1
 
 %build
 regparm_opts=
@@ -80,7 +79,8 @@ popd
 %{__install} -p -D -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
 %{__install} -p -D -m 0644 %{SOURCE2} %{buildroot}%{haproxy_confdir}/%{name}.cfg
 %{__install} -p -D -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
-%{__install} -p -D -m 0644 %{SOURCE4} %{buildroot}%{_mandir}/man1/halog.1
+%{__install} -p -D -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
+%{__install} -p -D -m 0644 %{SOURCE5} %{buildroot}%{_mandir}/man1/halog.1
 %{__install} -d -m 0755 %{buildroot}%{haproxy_home}
 %{__install} -d -m 0755 %{buildroot}%{haproxy_datadir}
 %{__install} -d -m 0755 %{buildroot}%{_bindir}
@@ -130,6 +130,7 @@ exit 0
 %{haproxy_datadir}/*
 %config(noreplace) %{haproxy_confdir}/%{name}.cfg
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
+%config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %{_unitdir}/%{name}.service
 %{_sbindir}/%{name}
 %{_sbindir}/%{name}-systemd-wrapper
@@ -139,14 +140,26 @@ exit 0
 %attr(-,%{haproxy_user},%{haproxy_group}) %dir %{haproxy_home}
 
 %changelog
-* Thu Jul 16 2015 Ryan O'Hara <rohara@redhat.com> - 1.5.4-4.1
-- Fix buffer_slow_realign() function to respect output data (CVE-2015-3281, #1241537)
+* Tue Aug 25 2015 Ryan O'Hara <rohara@redhat.com> - 1.5.14-3
+- Add EnvironmentFile to systemd service (#1191675)
 
-* Thu May 21 2015 Ryan O'Hara <rohara@redhat.com> - 1.5.4-4
-- Define TCP_USER_TIMEOUT at build time (#1198791)
+* Mon Jul 06 2015 Ryan O'Hara <rohara@redhat.com> - 1.5.14-1
+- Update to stable release 1.5.14 (CVE-2015-3281, #1212193)
 
-* Tue May 05 2015 Ryan O'Hara <rohara@redhat.com> - 1.5.4-3
-- Add tcp-ut bind option to set TCP_USER_TIMEOUT (#1198791)
+* Wed Jun 24 2015 Ryan O'Hara <rohara@redhat.com> - 1.5.12-2
+- Rebase TCP uset timeout patch for 1.5.12 release (#1212193)
+
+* Tue Jun 23 2015 Ryan O'Hara <rohara@redhat.com> - 1.5.12-1
+- Update to stable release 1.5.12 (#1212193)
+
+* Thu May 21 2015 Ryan O'Hara <rohara@redhat.com> - 1.5.4-5
+- Define TCP_USER_TIMEOUT at build time (#1190776)
+
+* Wed Mar 04 2015 Ryan O'Hara <rohara@redhat.com> - 1.5.4-4
+- Read sysconfig file for extra options (#1191675)
+
+* Wed Mar 04 2015 Ryan O'Hara <rohara@redhat.com> - 1.5.4-3
+- Add tcp-ut bind option to set TCP_USER_TIMEOUT (#1190776)
 
 * Tue Nov 18 2014 Ryan O'Hara <rohara@redhat.com> - 1.5.4-2
 - Fix date in changelog

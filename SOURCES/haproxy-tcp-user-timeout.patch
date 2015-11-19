@@ -1,4 +1,4 @@
-From 6248d4bad6a79ca6a39d5a60ac038bf22eb28dae Mon Sep 17 00:00:00 2001
+From a8d1818959a7a2351d94e077b60e84b0b35ec231 Mon Sep 17 00:00:00 2001
 From: Willy Tarreau <w@1wt.eu>
 Date: Wed, 4 Feb 2015 00:45:58 +0100
 Subject: [PATCH] MEDIUM: tcp: implement tcp-ut bind option to set
@@ -23,10 +23,10 @@ Thanks to Thijs Houtenbos and John Eckersberg for the suggestion.
  3 files changed, 55 insertions(+), 1 deletion(-)
 
 diff --git a/doc/configuration.txt b/doc/configuration.txt
-index 19df5ae..12b9236 100644
+index 6714afb..e131e99 100644
 --- a/doc/configuration.txt
 +++ b/doc/configuration.txt
-@@ -8547,6 +8547,19 @@ strict-sni
+@@ -8637,6 +8637,19 @@ strict-sni
    a certificate. The default certificate is not used.
    See the "crt" option for more information.
  
@@ -59,10 +59,10 @@ index 83b63af..2d71df6 100644
  
  	struct list by_fe;              /* chaining in frontend's list of listeners */
 diff --git a/src/proto_tcp.c b/src/proto_tcp.c
-index 72dc92b..f833861 100644
+index cfa62f7..e98a9fb 100644
 --- a/src/proto_tcp.c
 +++ b/src/proto_tcp.c
-@@ -829,6 +829,15 @@ int tcp_bind_listener(struct listener *listener, char *errmsg, int errlen)
+@@ -838,6 +838,15 @@ int tcp_bind_listener(struct listener *listener, char *errmsg, int errlen)
  		}
  	}
  #endif
@@ -78,7 +78,7 @@ index 72dc92b..f833861 100644
  #if defined(TCP_DEFER_ACCEPT)
  	if (listener->options & LI_O_DEF_ACCEPT) {
  		/* defer accept by up to one second */
-@@ -1973,8 +1982,36 @@ static int bind_parse_mss(char **args, int cur_arg, struct proxy *px, struct bin
+@@ -1986,8 +1995,36 @@ static int bind_parse_mss(char **args, int cur_arg, struct proxy *px, struct bin
  }
  #endif
  
@@ -116,7 +116,7 @@ index 72dc92b..f833861 100644
  static int bind_parse_interface(char **args, int cur_arg, struct proxy *px, struct bind_conf *conf, char **err)
  {
  	struct listener *l;
-@@ -2043,6 +2080,9 @@ static struct bind_kw_list bind_kws = { "TCP", { }, {
+@@ -2056,6 +2093,9 @@ static struct bind_kw_list bind_kws = { "TCP", { }, {
  #ifdef TCP_MAXSEG
  	{ "mss",           bind_parse_mss,          1 }, /* set MSS of listening socket */
  #endif
@@ -127,5 +127,5 @@ index 72dc92b..f833861 100644
  	{ "tfo",           bind_parse_tfo,          0 }, /* enable TCP_FASTOPEN of listening socket */
  #endif
 -- 
-1.8.1.4
+1.9.3
 
