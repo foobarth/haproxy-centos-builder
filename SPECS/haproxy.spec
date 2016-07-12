@@ -7,24 +7,21 @@
 %global _hardened_build 1
 
 Name:           haproxy
-Version:        1.5.14
-Release:        3%{?dist}
+Version: 1.6.6
+Release: 1%{?dist}
 Summary:        TCP/HTTP proxy and load balancer for high availability environments
 
 Group:          System Environment/Daemons
 License:        GPLv2+
 
 URL:            http://www.haproxy.org/
-Source0:        http://www.haproxy.org/download/1.5/src/haproxy-%{version}.tar.gz
+Source0:        http://www.haproxy.org/download/1.6/src/haproxy-%{version}.tar.gz
 Source1:        %{name}.service
 Source2:        %{name}.cfg
-Source3:        %{name}.logrotate
+# Source3:        %{name}.logrotate
 Source4:        %{name}.sysconfig
 Source5:        halog.1
 
-Patch0:         halog-unused-variables.patch
-Patch1:         iprange-return-type.patch
-Patch2:         haproxy-tcp-user-timeout.patch
 
 BuildRequires:  pcre-devel
 BuildRequires:  zlib-devel
@@ -52,9 +49,6 @@ availability environments. Indeed, it can:
 
 %prep
 %setup -q
-%patch0 -p0
-%patch1 -p0
-%patch2 -p1
 
 %build
 regparm_opts=
@@ -62,7 +56,7 @@ regparm_opts=
 regparm_opts="USE_REGPARM=1"
 %endif
 
-%{__make} %{?_smp_mflags} CPU="generic" TARGET="linux2628" USE_OPENSSL=1 USE_PCRE=1 USE_ZLIB=1 ${regparm_opts} ADDINC="%{optflags}" USE_LINUX_TPROXY=1 ADDLIB="%{__global_ldflags}" DEFINE=-DTCP_USER_TIMEOUT=18
+%{__make} %{?_smp_mflags} CPU="generic" TARGET="linux2628" USE_OPENSSL=1 USE_PCRE=1 USE_ZLIB=1 ${regparm_opts} ADDINC="%{optflags}" USE_LINUX_TPROXY=1 ADDLIB="%{__global_ldflags}" DEFINE=-DTCP_USER_TIMEOUT=18 EXTRAS=haproxy-systemd-wrapper
 
 pushd contrib/halog
 %{__make} halog OPTIMIZE="%{optflags}"
@@ -73,12 +67,12 @@ pushd contrib/iprange
 popd
 
 %install
-%{__make} install-bin DESTDIR=%{buildroot} PREFIX=%{_prefix}
+%{__make} install-bin DESTDIR=%{buildroot} PREFIX=%{_prefix} EXTRA=haproxy-systemd-wrapper
 %{__make} install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 
 %{__install} -p -D -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
 %{__install} -p -D -m 0644 %{SOURCE2} %{buildroot}%{haproxy_confdir}/%{name}.cfg
-%{__install} -p -D -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
+# %{__install} -p -D -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 %{__install} -p -D -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
 %{__install} -p -D -m 0644 %{SOURCE5} %{buildroot}%{_mandir}/man1/halog.1
 %{__install} -d -m 0755 %{buildroot}%{haproxy_home}
@@ -129,7 +123,7 @@ exit 0
 %dir %{haproxy_datadir}
 %{haproxy_datadir}/*
 %config(noreplace) %{haproxy_confdir}/%{name}.cfg
-%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
+# %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %{_unitdir}/%{name}.service
 %{_sbindir}/%{name}

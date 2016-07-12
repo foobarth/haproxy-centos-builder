@@ -1,1 +1,5 @@
 SOURCES/haproxy-1.5.14.tar.gz
+image-built
+output
+*.tar.gz
+*.bak
