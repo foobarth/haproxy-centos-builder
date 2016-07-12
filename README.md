@@ -9,3 +9,7 @@ Building it in docker is easy:
 You can try and build a different version by providing it as an argument to the builder.
 
     make VERSION=1.6.5 RELEASE=2
+
+# Grab the artifact
+
+If you're in a hurry and willing to trust some guy on github, [you can download a package here](https://github.com/timcharper/haproxy-centos-builder/releases/).
