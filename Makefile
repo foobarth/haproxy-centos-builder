@@ -1,4 +1,4 @@
-VERSION=1.6.6
+VERSION=1.7.1
 RELEASE=1
 .PHONY: default setver
 
@@ -7,7 +7,7 @@ default: output/haproxy-$(VERSION)-$(RELEASE).el7.centos.x86_64.rpm
 clean:
 	rm -f image-built output/haproxy-*.rpm
 image-built:
-	docker build --tag haproxy-builder .
+	docker build --build-arg HTTP_PROXY=${HTTP_PROXY} --build-arg http_proxy=${HTTP_PROXY} --build-arg HTTPS_PROXY=${HTTPS_PROXY} --build-arg https_proxy=${https_proxy} --tag haproxy-builder .
 	touch $@
 
 SOURCES/haproxy-$(VERSION).tar.gz:
