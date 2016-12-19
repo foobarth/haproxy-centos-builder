@@ -7,7 +7,7 @@
 %global _hardened_build 1
 
 Name:           haproxy
-Version: 1.6.6
+Version: 1.7.1
 Release: 1%{?dist}
 Summary:        TCP/HTTP proxy and load balancer for high availability environments
 
